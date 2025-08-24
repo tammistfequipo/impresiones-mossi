@@ -3,36 +3,185 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Impresiones Mossi</title>
-<!-- Fuente Poppins (con cursiva y bold) -->
+<title>Impresiones Mosi</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,700;1,700&display=swap" rel="stylesheet">
 <style>
   body {
     margin: 0;
-    background: #f9f9f9;  /* fondo claro */
-    color: #111;          /* texto oscuro */
+    background: #f9f9f9;
+    color: #111;
     font-family: 'Poppins', sans-serif;
   }
 
   header {
     text-align: center;
-    padding: 40px 20px;
+    padding: 30px 20px;
     border-bottom: 1px solid #ddd;
     background: #fff;
   }
-
   header h1 {
     margin: 0;
-    font-size: 40px;       /* más grande */
-    font-weight: 700;      /* más gordita */
-    font-style: italic;    /* cursiva */
-    color: #111;
+    font-size: 40px;
+    font-weight: 700;
+    font-style: italic;
+  }
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .product {
+    flex: 1 1 calc(25% - 20px);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+  }
+  .product img {
+    max-width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .product h3 {
+    margin: 10px 0 5px;
+    font-size: 18px;
+  }
+  .product p {
+    margin: 5px 0;
+    font-weight: 600;
+  }
+  .product button {
+    margin-top: 8px;
+    padding: 8px 14px;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .product button:hover {
+    background: #16a34a;
+  }
+
+  /* Carrito */
+  #cart {
+    max-width: 400px;
+    margin: 20px auto;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+  }
+  #cart h2 {
+    margin-top: 0;
+  }
+  #cart ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #cart li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dashed #ddd;
+  }
+  #total {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: right;
+  }
+  #whatsapp {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    background: #25D366;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
   }
 </style>
 </head>
 <body>
   <header>
-    <h1>Impresiones Mossi</h1>
+    <h1>Impresiones Mosi</h1>
   </header>
+
+  <div class="container" id="products">
+    <!-- Ejemplo de productos -->
+    <div class="product">
+      <img src="a4.jpg" alt="Impresión A4">
+      <h3>Impresión A4 Color</h3>
+      <p>$700</p>
+      <button onclick="addToCart('Impresión A4 Color', 700)">Agregar al carrito</button>
+    </div>
+
+    <div class="product">
+      <img src="tarjetas.jpg" alt="Tarjetas">
+      <h3>Tarjetas personales (100u)</h3>
+      <p>$8500</p>
+      <button onclick="addToCart('Tarjetas personales (100u)', 8500)">Agregar al carrito</button>
+    </div>
+
+    <div class="product">
+      <img src="stickers.jpg" alt="Stickers">
+      <h3>Stickers (10u)</h3>
+      <p>$2500</p>
+      <button onclick="addToCart('Stickers (10u)', 2500)">Agregar al carrito</button>
+    </div>
+
+    <div class="product">
+      <img src="lona.jpg" alt="Lona">
+      <h3>Lona 1x1m</h3>
+      <p>$12000</p>
+      <button onclick="addToCart('Lona 1x1m', 12000)">Agregar al carrito</button>
+    </div>
+  </div>
+
+  <div id="cart">
+    <h2>🛒 Carrito</h2>
+    <ul id="cartItems"></ul>
+    <div id="total">Total: $0</div>
+    <a id="whatsapp" href="#" target="_blank">Enviar pedido por WhatsApp</a>
+  </div>
+
+<script>
+let cart = [];
+let total = 0;
+
+function addToCart(name, price) {
+  cart.push({ name, price });
+  total += price;
+  renderCart();
+}
+
+function renderCart() {
+  const cartItems = document.getElementById("cartItems");
+  cartItems.innerHTML = "";
+  cart.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item.name + " - $" + item.price;
+    cartItems.appendChild(li);
+  });
+  document.getElementById("total").textContent = "Total: $" + total;
+
+  // Redirigir a WhatsApp
+  const mensaje = encodeURIComponent("Hola, quiero hacer este pedido:\n" + 
+    cart.map(item => "- " + item.name + " $" + item.price).join("\n") + 
+    "\n\nTotal: $" + total);
+  document.getElementById("whatsapp").href = "https://wa.me/54911XXXXXXXX?text=" + mensaje;
+}
+</script>
 </body>
 </html>
