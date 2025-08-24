@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tienda de Impresiones | Carrito + WhatsApp</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0e; --card:#121219; --muted:#9aa0a6; --text:#e8eaed; --brand:#22c55e; --brand2:#06b6d4; --danger:#ef4444; --accent:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 700px at 20% -10%, #1a1a2e 0%, transparent 60%) , radial-gradient(1000px 600px at 120% 10%, #0f172a 0%, transparent 55%), var(--bg); color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  header{position:sticky;top:0;backdrop-filter:blur(6px);background:rgba(10,10,14,.6);border-bottom:1px solid rgba(255,255,255,.06);z-index:10}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px}
+  .brand{display:flex;gap:10px;align-items:center}
+  .brand .dot{width:12px;height:12px;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+  .brand h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.2px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:16px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .card h3{margin:6px 0 6px;font-size:16px}
+  .price{font-weight:800;margin:6px 0;color:#fff}
+  .muted{color:var(--muted);font-size:13px}
+  .row{display:flex;gap:8px;align-items:center;margin-top:10px}
+  input.qty{width:72px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0e0f14;color:#fff;padding:8px 10px;font-weight:700;text-align:center}
+  button.add{flex:1;padding:10px 12px;border:0;border-radius:12px;background:linear-gradient(90deg,var(--brand),var(--brand2));color:#03110a;font-weight:800;cursor:pointer}
+  .layout{display:grid;grid-template-columns:1fr 340px;gap:18px}
+  aside{position:sticky;top:76px;height:fit-content;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px}
+  aside h2{font-size:18px;margin:0 0 10px}
+  .line{display:flex;justify-content:space-between;gap:10px;padding:8px;border-bottom:1px dashed rgba(255,255,255,.07)}
+  .line b{font-size:14px}
+  .line small{color:var(--muted)}
+  .remove{background:none;border:0;color:var(--danger);cursor:pointer;font-weight:800}
+  .total{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:2px solid rgba(255,255,255,.1)}
+  .big{font-size:22px;font-weight:900}
+  .field{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+  .field input,.field textarea,.field select{border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#0e0f14;color:#fff;padding:10px 12px}
+  .cta{display:flex;gap:10px;margin-top:12px}
+  .cta button{flex:1;padding:12px;border:0;border-radius:14px;font-weight:900;cursor:pointer}
+  .whats{background:linear-gradient(90deg,#25D366,#20c05a);color:#04230f}
+  .clear{background:#1f2937;color:#e5e7eb}
+  footer{color:var(--muted);text-align:center;font-size:12px;margin:22px 0}
+  .chip{display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.35);color:#e9d5ff;font-size:12px;margin-left:8px}
+  @media (max-width:960px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap brand">
+    <div class="dot"></div>
+    <h1>Impresiones Pro · Carrito <span class="chip">Redirige a WhatsApp</span></h1>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <main>
+    <div class="grid" id="productGrid"></div>
+
+    <!-- Item personalizado -->
+    <div class="card" style="margin-top:18px">
+      <h3>Producto personalizado</h3>
+      <p class="muted">Definí tu propio ítem (ej.: “Lona 1x2m”, “Tarjetas 500u”, etc.).</p>
+      <div class="row">
+        <input id="customName" class="qty" style="flex:1" placeholder="Nombre del producto">
+        <input id="customPrice" class="qty" type="number" min="0" step="1" placeholder="$ Precio">
+        <input id="customQty" class="qty" type="number" min="1" step="1" value="1">
+        <button class="add" onclick="addCustom()">Agregar</button>
+      </div>
+    </div>
+  </main>
+
+  <aside>
+    <h2>Tu pedido</h2>
+    <div id="cartLines"></div>
+
+    <div class="total">
+      <span>Total</span>
+      <span class="big" id="grandTotal">$ 0</span>
+    </div>
+
+    <div class="field">
+      <label>Tu nombre (para identificar pedido)</label>
+      <input id="buyerName" placeholder="Ej.: Julio">
+    </div>
+
+    <div class="field">
+      <label>Notas (colores, papel, link a archivo, etc.)</label>
+      <textarea id="notes" rows="3" placeholder="Ej.: Papel ilustración 300g, retiro en local."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Entrega</label>
+      <select id="delivery">
+        <option value="Retiro en local">Retiro en local</option>
+        <option value="Envío a domicilio">Envío a domicilio</option>
+        <option value="Moto (a coordinar)">Moto (a coordinar)</option>
+      </select>
+    </div>
+
+    <div class="cta">
+      <button class="clear" onclick="clearCart()">Vaciar</button>
+      <button class="whats" onclick="goWhats()">Enviar a WhatsApp</button>
+    </div>
+  </aside>
+</div>
+
+<footer>© Tu imprenta — Precios orientativos en ARS. Podés editarlos en el código.</footer>
+
+<script>
+/** =========================
+ *  CONFIGURACIÓN EDITABLE
+ *  ========================= */
+const PHONE_AR = "54911XXXXXXXX"; // 👈 Reemplazá por tu número con código país (ej: 5491122334455)
+const CURRENCY = "ARS $";
+
+// Lista de productos (editá nombres/precios)
+const PRODUCTS = [
+  { id:"a4_bn",   name:"Impresión A4 B&N",            price:300 },
+  { id:"a4_color",name:"Impresión A4 Color",          price:700 },
+  { id:"a3_color",name:"Impresión A3 Color",          price:1400 },
+  { id:"tarjetas",name:"Tarjetas personales (100u)",  price:8500 },
+  { id:"volantes",name:"Volantes A5 (1000u)",         price:48000 },
+  { id:"stickers",name:"Stickers troquel (10u)",      price:2500 },
+  { id:"lona",    name:"Lona 1x1 m",                  price:12000 },
+  { id:"vinilo",  name:"Vinilo autoadhesivo 1x1 m",   price:14500 },
+];
+
+// ============== Render de productos ==============
+const grid = document.getElementById("productGrid");
+PRODUCTS.forEach(p=>{
+  const el = document.createElement("div");
+  el.className = "card";
+  el.innerHTML = `
+    <h3>${p.name}</h3>
+    <div class="muted">Código: ${p.id}</div>
+    <div class="price">${CURRENCY} ${p.price.toLocaleString("es-AR")}</div>
+    <div class="row">
+      <input class="qty" type="number" min="1" step="1" value="1" id="qty_${p.id}">
+      <button class="add" onclick="addToCart('${p.id}')">Agregar</button>
+    </div>
+  `;
+  grid.appendChild(el);
+});
+
+// ============== Carrito (localStorage) ==============
+const CART_KEY = "print_cart_v1";
+let cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+
+function saveCart(){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); renderCart(); }
+
+function addToCart(id){
+  const prod = PRODUCTS.find(x=>x.id===id);
+  const qty = Math.max(1, parseInt(document.getElementById("qty_"+id).value || "1",10));
+  const line = cart.find(x=>x.id===id);
+  if(line){ line.qty += qty; }
+  else{ cart.push({ id, name: prod.name, price: prod.price, qty }); }
+  saveCart();
+}
+
+function addCustom(){
+  const name = (document.getElementById("customName").value || "").trim();
+  const price = parseFloat(document.getElementById("customPrice").value || "0");
+  const qty = Math.max(1, parseInt(document.getElementById("customQty").value || "1",10));
+  if(!name || price <= 0){ alert("Completá nombre y precio mayor a 0"); return; }
+  const id = "custom_"+Date.now();
+  cart.push({ id, name, price, qty });
+  document.getElementById("customName").value="";
+  document.getElementById("customPrice").value="";
+  document.getElementById("customQty").value="1";
+  saveCart();
+}
+
+function removeLine(id){
+  cart = cart.filter(x=>x.id!==id);
+  saveCart();
+}
+
+function clearCart(){
+  if(confirm("¿Vaciar carrito?")){
+    cart = [];
+    saveCart();
+  }
+}
+
+function renderCart(){
+  const cont = document.getElementById("cartLines");
+  cont.innerHTML = "";
+  let total = 0;
+  cart.forEach(line=>{
+    const lineTotal = line.price*line.qty;
+    total += lineTotal;
+    const row = document.createElement("div");
+    row.className = "line";
+    row.innerHTML = `
+      <div>
+        <b>${line.name}</b> <small>× ${line.qty}</small><br>
+        <small class="muted">${CURRENCY} ${line.price.toLocaleString("es-AR")} c/u</small>
+      </div>
+      <div style="text-align:right">
+        <div><b>${CURRENCY} ${lineTotal.toLocaleString("es-AR")}</b></div>
+        <button class="remove" onclick="removeLine('${line.id}')">Quitar</button>
+      </div>
+    `;
+    cont.appendChild(row);
+  });
+  document.getElementById("grandTotal").textContent = `${CURRENCY} ${total.toLocaleString("es-AR")}`;
+}
+renderCart();
+
+// ============== WhatsApp ==============
+function goWhats(){
+  if(!cart.length){ alert("Tu carrito está vacío."); return; }
+  if(!/^\d+$/.test(PHONE_AR)){ alert("Configurá tu número de WhatsApp en PHONE_AR (solo dígitos con código país, ej: 54911XXXXXX)."); return; }
+
+  const name = (document.getElementById("buyerName").value || "").trim();
+  const notes = (document.getElementById("notes").value || "").trim();
+  const delivery = document.getElementById("delivery").value;
+
+  const lines = cart.map(l=>`• ${l.name} × ${l.qty} — ${CURRENCY} ${(l.price*l.qty).toLocaleString("es-AR")}`);
+  const total = cart.reduce((a,b)=>a + b.price*b.qty, 0);
+
+  let msg = `Hola, vengo de la tienda de impresiones.%0A`;
+  if(name) msg += `Nombre: ${encodeURIComponent(name)}%0A`;
+  msg += `%0A*Mi pedido:*%0A${encodeURIComponent(lines.join("%0A"))}%0A`;
+  msg += `%0A*Entrega:* ${encodeURIComponent(delivery)}%0A`;
+  if(notes) msg += `Notas: ${encodeURIComponent(notes)}%0A`;
+  msg += `%0A*Total:* ${encodeURIComponent(CURRENCY+" "+total.toLocaleString("es-AR"))}%0A`;
+
+  const url = `https://wa.me/${PHONE_AR}?text=${msg}`;
+  window.location.href = url;
+}
+</script>
+</body>
+</html>
